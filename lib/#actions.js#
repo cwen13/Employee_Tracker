@@ -10,7 +10,7 @@ var viewEmployees =
 
 // TODO - neeed to get join working
 var viewEmployeesByManager =
-    "SELECT CONCAT(e.first_name,' ',e.last_name) AS 'Employee', CONCAT(e.first_name,' ',last_name) AS 'Manager' FROM employee AS e INNER JOIN e ON e employee.manager_id = employee.id GROUP BY 'Manager' ORDER BY 'Manager';";
+    "SELECT CONCAT(e.first_name,' ',e.last_name) AS 'Employee', CONCAT(e.first_name,' ',last_name) AS 'Manager' FROM employee AS e JOIN e ON e employee.manager_id = employee.id GROUP BY e.manager_id;";
 
 
 var viewEmployeesByDepartment =

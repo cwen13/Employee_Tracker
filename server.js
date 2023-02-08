@@ -14,6 +14,11 @@ const db_conn = mysql.createConnection(
   }
 );
 
+let quiers
+
+
+// need to set questions.{roles,managers,departments}
+
 async function main () {
   let quit = false;
   while(true) {

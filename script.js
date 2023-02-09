@@ -69,16 +69,23 @@ async function main () {
 		    (err,res) => console.table("\n",res,"\n\n"));
 
       break;
-    case("09"): // Add a department
+    case("09"): // DONE Add a department
+      let newDepartment = await inquirer.prompt(questions.addDepartment);
       db_conn.query(queries.addDepartment,
 		    [],
-		    (err,res) => console.table("\n",res,"\n\n"));
-
+		    (err,res) => console.log(`New department: ${newDepartment} added!`));
       break;
-    case("10"): // Add a role
+    case("10"): // DONE Add a role
+      question.departments = db_conn.query("SELECT name FROM department;")
+	.map((entry) => entry["name"]);
+      let newRole = await inquirer.prompt(
+	questions.addRole.append(questions.mainRole));
+      let departmentID = db_conn.query(`SELECT id FROM department WHERE name=${newRole.depart};`,
+				       [],
+				       (err, res) => return 0);
       db_conn.query(queries.addRole,
-		    [],
-		    (err,res) => console.table("\n",res,"\n\n"));
+		    [newRole.role, newRole.salary, departmentID],
+		    (err,res) => console.log(`New role: ${newRole} added!`));
 
       break;
     case("11"): // Add an employee
@@ -88,21 +95,30 @@ async function main () {
 
       break;
     case("12"): // Delete a department
+      question.departments = db_conn.query("SELECT name FROM department;")
+	.map((entry) => entry["name"]);
+      let delDepartment = inquirer.prompt(questions.deleteDepart);
       db_conn.query(queries.deleteDepartment,
-		    [],
-		    (err,res) => console.table("\n",res,"\n\n"));
+		    [delDepartment],
+		    (err,res) => console.table(`Deleted ${delDepartment}`));
 
       break;
     case("13"): // Delete a role
+      question.roles = db_conn.query("SELECT title FROM role;")
+	.map((entry) => entry["title"]);
+      let delRole = inquirer.prompt(questions.deleteRole);
       db_conn.query(queries.deleteRole,
-		    [],
-		    (err,res) => console.table("\n",res,"\n\n"));
+		    [delRole],
+		    (err,res) => console.table(`Deleted ${delRole}`));
 
       break;
     case("14"): // Delete an employee
+      question.employees = db_conn.query("SELECT CONCAT( first_name,' ',last_name) AS Employee Name' FROM employee;")
+	.map((entry) => entry["Employee Name"]);
+      let delEmployee = inquirer.prompt(questions.deleteEmployee);
       db_conn.query(queries.deleteEmployee,
-		    [],
-		    (err,res) => console.table("\n",res,"\n\n"));
+		    [delEmployee.split(' ')],
+		    (err,res) => console.table(`Deleted ${delEmployee}`));
 
       break;
     case("15"): // Quit

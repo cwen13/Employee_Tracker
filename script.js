@@ -67,16 +67,22 @@ async function main () {
     case("08"): // Update employee manager
       break;
     case("09"): // Add a department
+      
       break;
     case("10"): // Add a role
+      
       break;
     case("11"): // Add an employee
+      
       break;
     case("12"): // Delete a department
+      
       break;
     case("13"): // Delete a role
+      
       break;
     case("14"): // Delete a employee
+      
       break;
     case("15"): // Quit
       quit = true;

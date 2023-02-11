@@ -22,42 +22,43 @@ async function main () {
 
     // execute action
     switch (action.mainAction.slice(0,2)) {
-    case("01"): // View all departments
+    case("01"): // DONE View all departments
       db_conn.query(queries.viewDepartments,
 		    [],
 		    (err,res) => console.table("\n",res,"\n\n"));
       break;
-    case("02"): // View all roles
+    case("02"): // DONE View all roles
       db_conn.query(queries.viewRoles,
 		    [],
 		    (err,res) => console.table("\n",res,"\n\n"));
 
       break;
-    case("03"): // View all employees
+    case("03"): // DONE View all employees
       db_conn.query(queries.viewEmployees,
 		    [],
 		    (err,res) => console.table("\n",res,"\n\n"));
 
       break;
-    case("04"): // View emplyees by manager
+    case("04"): // DONE View emplyees by manager
       db_conn.query(queries.viewEmployeesByManager,
 		    [],
 		    (err,res) => console.table("\n",res,"\n\n"));
 
       break;
-    case("05"): // View employees by department
+    case("05"): // DONE View employees by department
       db_conn.query(queries.viewEmployeesByDepartment,
 		    [],
 		    (err,res) => console.table("\n",res,"\n\n"));
 
       break;
-    case("06"): // View total utlized budget
+    case("06"): // DONE View total utlized budget
       db_conn.query(queries.viewTotBudget,
-		    [],
+		    
 		    (err,res) => console.table("\n",res,"\n\n"));
 
       break;
     case("07"): // Update an employee role
+      
       db_conn.query(queries.updateEmployeeRole,
 		    [],
 		    (err,res) => console.table("\n",res,"\n\n"));
@@ -72,21 +73,16 @@ async function main () {
     case("09"): // DONE Add a department
       let newDepartment = await inquirer.prompt(questions.addDepartment);
       db_conn.query(queries.addDepartment,
-		    [],
+		    [newDepartment.department],
 		    (err,res) => console.log(`New department: ${newDepartment} added!`));
       break;
-    case("10"): // DONE Add a role
-      questions.departments = db_conn.query("SELECT name FROM department;")
-//	.map((entry) => entry["name"]);
-//      let newRole = await inquirer.prompt(
-//	questions.addRole.append(questions.mainRole));
-//      let departmentID = db_conn.query(`SELECT id FROM department WHERE name=${newRole.depart};`,
-//				       [],
-//				       (err, res) => return 0);
-//      db_conn.query(queries.addRole,
-//		    [newRole.role, newRole.salary, departmentID],
-//		    (err,res) => console.log(`New role: ${newRole} added!`));
-//
+    case("10"): // Add a role
+      let newRole = await inquirer.prompt(
+	questions.addRole.append(questions.mainRole));
+      db_conn.query(queries.addRole,
+		    [newRole.role, newRole.salary, departmentID],
+		    (err,res) => console.log(`New role: ${newRole} added!`));
+
       break;
     case("11"): // Add an employee
       db_conn.query(queries.addEmpolyee,
@@ -95,21 +91,30 @@ async function main () {
 
       break;
     case("12"): // Delete a department
-      questions.departments = db_conn.query("SELECT name FROM department;")
+      questions.departments = db_conn.query("SELECT name, id FROM department;")
+      // need to make output an array of objects in following form
+      // from given array of [{name:"sdfs",id:23},{name:"gfgdfg",id:8},...]
+      // choices: [{name:"title1",value:1},{name:"Title2",value:2},....]
 //	.map((entry) => entry["name"]);
       let delDepartment = inquirer.prompt(questions.deleteDepart);
       db_conn.query(queries.deleteDepartment,
 		    [delDepartment],
-		    (err,res) => console.table(`Deleted ${delDepartment}`));
+		    (err,res) => console.log(`Deleted ${delDepartment}`));
 
       break;
-    case("13"): // DONE Delete a role
-      questions.roles = db_conn.query("SELECT title FROM role;")
-//	.map((entry) => entry["title"]);
+    case("13"): //  Delete a role
+      questions.roles = db_conn.query("SELECT title, id FROM role;",
+				      (err, results) => {
+					console.table(results);
+					questions.roles = results;
+				      });
+      console.log(Object.keys(questions.roles));
+      console.log(questions.roles.values);
+      
       let delRole = inquirer.prompt(questions.deleteRole);
       db_conn.query(queries.deleteRole,
 		    [delRole],
-		    (err,res) => console.table(`Deleted ${delRole}`));
+		    (err,res) => console.log(`Deleted ${delRole}`));
 
       break;
     case("14"): // Delete an employee
@@ -132,7 +137,8 @@ async function main () {
 	   
     if (quit) break; 
   }
-  process.exit(0);
+  //  process.exit(0);
+  return 0;
 }
       
 main();  

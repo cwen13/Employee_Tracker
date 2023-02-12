@@ -16,12 +16,12 @@ const db_conn = mysql.createConnection(
 
 async function main () {
   let quit = false;
-  while(true) {
+//  while(true) {
     // need to promtp to find what the user wants to do
     let action = await inquirer.prompt(questions.mainMenu);
 
     // execute action
-    switch (action.mainAction.slice(0,2)) {
+  switch (action.mainAction.slice(0,2)) {
     case("01"): // DONE View all departments
       db_conn.query(queries.viewDepartments,
 		    [],
@@ -77,16 +77,23 @@ async function main () {
 		    (err,res) => console.log(`New department: ${newDepartment} added!`));
       break;
     case("10"): // Add a role
+    console.log(action.mainAction.slice(0,2))
       let newRole = await inquirer.prompt(
-	questions.addRole.append(questions.mainRole));
+	[questions.addRole.push(questions.mainRole)]);
       db_conn.query(queries.addRole,
 		    [newRole.role, newRole.salary, departmentID],
 		    (err,res) => console.log(`New role: ${newRole} added!`));
 
       break;
     case("11"): // Add an employee
+      let newEmployee = await inquirer.prompt(
+	questions.addEmployee.push(questions.mainEmployee));
       db_conn.query(queries.addEmpolyee,
-		    [],
+		    [newEmployee.firstName,
+		     newEmployee.lastName,
+		     newEmployee.rold_id,
+		     newEmployee.manager_id
+		    ],
 		    (err,res) => console.table("\n",res,"\n\n"));
 
       break;
@@ -103,13 +110,25 @@ async function main () {
 
       break;
     case("13"): //  Delete a role
-      questions.roles = db_conn.query("SELECT title, id FROM role;",
-				      (err, results) => {
-					console.table(results);
-					questions.roles = results;
-				      });
-      console.log(Object.keys(questions.roles));
-      console.log(questions.roles.values);
+//      console.log(db_conn);
+      db_conn.query("SELECT title, id FROM role;",
+		    (err, results) => {
+		      console.log("first");
+		      if (err) {
+			console.log("Error:",err);
+			return;
+		      }
+		      if (results.length) {
+			console.log("There is stuff here");
+			for (let i=0; i<results.length; i++) {
+			  console.log(results[i].title, results[i].id);
+			  //			questions.roles = results;
+			}
+		      }
+		    });
+      process.exit(0);
+//      console.log(Object.keys(questions.roles));
+//      console.log(questions.roles);
       
       let delRole = inquirer.prompt(questions.deleteRole);
       db_conn.query(queries.deleteRole,
@@ -134,9 +153,7 @@ async function main () {
     default:
       break;
     }
-	   
-    if (quit) break; 
-  }
+  main();
   //  process.exit(0);
   return 0;
 }

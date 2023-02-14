@@ -111,29 +111,28 @@ async function main () {
       break;
     case("13"): //  Delete a role
 //      console.log(db_conn);
-      db_conn.query("SELECT title, id FROM role;",
-		    (err, results) => {
+    db_conn.query("SELECT title, id FROM role;",
+		    async (err, results) => {
 		      console.log("first");
 		      if (err) {
 			console.log("Error:",err);
 			return;
 		      }
 		      if (results.length) {
-			console.log("There is stuff here");
-			for (let i=0; i<results.length; i++) {
-			  console.log(results[i].title, results[i].id);
-			  //			questions.roles = results;
-			}
-		      }
-		    });
-      process.exit(0);
+			console.log(results);
+			questions.roles = results.map((result) => { 
+			  console.log("name:",result["title"],
+				      ",value:",result["id"]);
+			  return {name:result["title"], value:result["id"]};
+			});
+			let delRole = await inquirer.prompt(questions.deleteRole);
+			db_conn.query(queries.deleteRole,
+ 				      [delRole],
+ 				      (err,res) => console.log(`Deleted ${delRole}`));
+		      }});
 //      console.log(Object.keys(questions.roles));
 //      console.log(questions.roles);
       
-      let delRole = inquirer.prompt(questions.deleteRole);
-      db_conn.query(queries.deleteRole,
-		    [delRole],
-		    (err,res) => console.log(`Deleted ${delRole}`));
 
       break;
     case("14"): // Delete an employee

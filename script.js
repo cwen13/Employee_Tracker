@@ -16,14 +16,14 @@ const db_conn = mysql.createConnection(
 
 async function main () {
   let quit = false;
-//  while(true) {
+  while(true) {
     // need to promtp to find what the user wants to do
-    let action = await inquirer.prompt(questions.mainMenu);
+  let action = await inquirer.prompt(questions.mainMenu);
 
     // execute action
   switch (action.mainAction.slice(0,2)) {
-    case("01"): // DONE View all departments
-      db_conn.query(queries.viewDepartments,
+  case("01"): // DONE View all departments
+    db_conn.query(queries.viewDepartments,
 		    [],
 		    (err,res) => console.table("\n",res,"\n\n"));
       break;
@@ -119,20 +119,19 @@ async function main () {
 			return;
 		      }
 		      if (results.length) {
-			console.log(results);
 			questions.roles = results.map((result) => { 
-			  console.log("name:",result["title"],
-				      ",value:",result["id"]);
-			  return {name:result["title"], value:result["id"]};
+			   return {name:result["title"], value:result["id"]};
 			});
-			let delRole = await inquirer.prompt(questions.deleteRole);
-			db_conn.query(queries.deleteRole,
- 				      [delRole],
- 				      (err,res) => console.log(`Deleted ${delRole}`));
+			try{
+			  let delRole = await inquirer.prompt(
+			    questions.deleteRole(questions.roles));
+			  db_conn.query(queries.deleteRole,
+ 					[delRole["role"]],
+ 					(err,res) => console.log(`Deleted ${delRole["role"]}`));
+			} catch (err) {
+			  console.error(err);
+			}
 		      }});
-//      console.log(Object.keys(questions.roles));
-//      console.log(questions.roles);
-      
 
       break;
     case("14"): // Delete an employee
@@ -146,15 +145,18 @@ async function main () {
 		    (err,res) => console.table(`Deleted ${delEmployee}`));
 
       break;
-    case("15"): // Quit
-      quit = true;
-      break;
-    default:
-      break;
-    }
-  main();
-  //  process.exit(0);
-  return 0;
+  case("15"): // Quit
+    quit = true;
+    break;
+  default:
+    break;
+  }
+    if (quit) break;
+  }
+
+ //   if (!quit) main();
+    
+  process.exit(0);
 }
       
 main();  

@@ -16,8 +16,8 @@ const db_conn = mysql.createConnection(
 
 async function main () {
   let quit = false;
-  while(true) {
-    // need to promtp to find what the user wants to do
+//  while(true) {
+    // need to prmpt to find what the user wants to do
   let action = await inquirer.prompt(questions.mainMenu);
 
     // execute action
@@ -26,11 +26,11 @@ async function main () {
     db_conn.query(queries.viewDepartments,
 		    [],
 		    (err,res) => console.table("\n",res,"\n\n"));
-      break;
-    case("02"): // DONE View all roles
-      db_conn.query(queries.viewRoles,
-		    [],
-		    (err,res) => console.table("\n",res,"\n\n"));
+    break;
+  case("02"): // DONE View all roles
+    db_conn.query(queries.viewRoles,
+		  [],
+		  (err,res) => console.table("\n",res,"\n\n"));
 
       break;
     case("03"): // DONE View all employees
@@ -125,14 +125,23 @@ async function main () {
 			try{
 			  let delRole = await inquirer.prompt(
 			    questions.deleteRole(questions.roles));
+			  console.log(delRole["role"]);
 			  db_conn.query(queries.deleteRole,
  					[delRole["role"]],
- 					(err,res) => console.log(`Deleted ${delRole["role"]}`));
+ 					(err,res) => {
+					  console.log(`Deleted ${delRole["role"]}`);
+					  if(err) console.error(err);
+					});
+			  db_conn.query(queries.viewRoles,
+					[],
+					(err,res) => console.table("\n",res,"\n\n"));
+
 			} catch (err) {
 			  console.error(err);
 			}
 		      }});
 
+    
       break;
     case("14"): // Delete an employee
       questions.employees = db_conn.query("SELECT CONCAT( first_name,' ',last_name) AS Employee Name' FROM employee;")
@@ -151,12 +160,12 @@ async function main () {
   default:
     break;
   }
-    if (quit) break;
-  }
-
- //   if (!quit) main();
+//    if (quit) break;
+//  }
+//
+   if (!quit) main();
     
-  process.exit(0);
+//  process.exit(0);
 }
       
 main();  

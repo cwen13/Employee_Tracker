@@ -14,6 +14,7 @@ const db_conn = mysql.createConnection(
   }
 );
 
+
 async function main () {
   let quit = false;
 //  while(true) {
@@ -34,25 +35,30 @@ async function main () {
 
       break;
     case("03"): // DONE View all employees
+
       db_conn.query(queries.viewEmployees,
 		    [],
 		    (err,res) => console.table("\n",res,"\n\n"));
 
       break;
+
     case("04"): // DONE View emplyees by manager
+
       db_conn.query(queries.viewEmployeesByManager,
 		    [],
 		    (err,res) => console.table("\n",res,"\n\n"));
 
       break;
+
     case("05"): // DONE View employees by department
       db_conn.query(queries.viewEmployeesByDepartment,
 		    [],
 		    (err,res) => console.table("\n",res,"\n\n"));
 
       break;
+
     case("06"): // DONE View total utlized budget
-      db_conn.query(queries.viewTotBudget,
+     db_conn.query(queries.viewTotBudget,
 		    
 		    (err,res) => console.table("\n",res,"\n\n"));
 
@@ -166,6 +172,7 @@ async function main () {
    if (!quit) main();
     
 //  process.exit(0);
+
 }
       
 main();  

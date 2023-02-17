@@ -8,14 +8,14 @@ VALUES ("Finance"),
 INSERT INTO role (title, salary, department_id)
 VALUES ("Director", 100000.00, 1),
        ("Producer",75000.00,1),
-       ("Constructor",90000.00,2),
+       ("Conductorr",90000.00,2),
        ("Snake wrangler",65000.00,2),
        ("Pigeon Tamer",78000.00,2),
        ("Goalie",90000.00,3),
        ("Forward Sales",45000.00,3),
        ("Backend Defender",45000.00,3),
        ("Tire Inflator",45000.00,4),
-       ("Bench Warmer",15000.00,4),
+       ("Beach Warmer",15000.00,4),
        ("Manager",25000.00,4);
        
 INSERT INTO employee (first_name, last_name, role_id, manager_id)

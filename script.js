@@ -26,15 +26,17 @@ async function main () {
     db_conn.query(queries.getDepartments,
 		  (err, results) => {
 		    departments = results.map((result) => {
-		       {name:result["name"], value:result["id"]}});
+		      return {name:result["name"], value:result["id"]}});
 		  });
     console.log("Departments:",departments);
+    
     db_conn.query(queries.getEmployees,
 		  (err, results) => {
 		    employees = results.map((result) => {
 		      return {name:result["name"], value:result["id"]}});
 		  });
-    console.log("Employees:", employees);
+    //console.log("Employees:", employees);
+    
     db_conn.query(queries.getRoles,
 		  (err, results) => {
 		    roles = results.map((result) => {

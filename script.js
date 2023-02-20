@@ -14,36 +14,28 @@ const db_conn = mysql.createConnection(
   }
 );
 
-let roles;
-let departments;
-let employees;
+let departments, roles, employees;
 
 async function main () {
   let quit = false;
   while(true) {
-  
-    // need to prmpt to find what the user wants to do
-    db_conn.query(queries.getDepartments,
-		  (err, results) => {
-		    departments = results.map((result) => {
-		      return {name:result["name"], value:result["id"]}});
-		  });
-    console.log("Departments:",departments);
-    
-    db_conn.query(queries.getEmployees,
-		  (err, results) => {
-		    employees = results.map((result) => {
-		      return {name:result["name"], value:result["id"]}});
-		  });
-    //console.log("Employees:", employees);
-    
-    db_conn.query(queries.getRoles,
-		  (err, results) => {
-		    roles = results.map((result) => {
-		      return {name:result["title"], value:result["id"]}});
-		  });
-    //    console.log("Roles:",roles);
-    
+//  
+//    // need to prmpt to find what the user wants to do
+//    
+//    db_conn.query(queries.getEmployees,
+//		  (err, results) => {
+//		    employees = results.map((result) => {
+//		      return {name:result["name"], value:result["id"]}});
+//		  });
+//    //console.log("Employees:", employees);
+//    
+//    db_conn.query(queries.getRoles,
+//		  (err, results) => {
+//		    roles = results.map((result) => {
+//		      return {name:result["title"], value:result["id"]}});
+//		  });
+//    //    console.log("Roles:",roles);
+//    
 					
     let roles = "";
     let employees = "";
@@ -132,17 +124,21 @@ async function main () {
 
       break;
     case("12"): // Delete a department
-      let delDepartment = await inquirer.prompt(questions.deleteDepart(departments));
-      console.log("Delete:",delDepartment);
-      console.log(queries.deleteDepartment);
-      try{
-	db_conn.query(queries.deleteDepartment,
-		      [delDepartment],
-		      (err,res) => console.log(`Deleted ${delDepartment}`));
-      } catch (err) {
-	console.error(err);
-      }
-
+      db_conn.query(queries.getDepartments,
+		    async (err, results) => {
+		      departments = results.map((result) => {
+			return {name:result["name"], value:result["id"]}});
+		      let delDepartment = await inquirer.prompt(questions.deleteDepart(departments));
+		      console.log("Delete:",delDepartment);
+		      try{
+			db_conn.query(queries.deleteDepartment,
+				      [delDepartment],
+				      (err,res) => console.log(`Deleted ${delDepartment}`));
+		      } catch (err) {
+			console.error(err);
+		      }
+		    });
+      
       break;
     case("13"): //  Delete a role
       console.log(db_conn);

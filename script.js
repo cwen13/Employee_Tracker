@@ -14,31 +14,13 @@ const db_conn = mysql.createConnection(
   }
 );
 
-let departments, roles, employees;
+let departments;
+let roles;
+let employees;
 
 async function main () {
   let quit = false;
   while(true) {
-//  
-//    // need to prmpt to find what the user wants to do
-//    
-//    db_conn.query(queries.getEmployees,
-//		  (err, results) => {
-//		    employees = results.map((result) => {
-//		      return {name:result["name"], value:result["id"]}});
-//		  });
-//    //console.log("Employees:", employees);
-//    
-//    db_conn.query(queries.getRoles,
-//		  (err, results) => {
-//		    roles = results.map((result) => {
-//		      return {name:result["title"], value:result["id"]}});
-//		  });
-//    //    console.log("Roles:",roles);
-//    
-					
-    let roles = "";
-    let employees = "";
     let action = await inquirer.prompt(questions.mainMenu);
     
     // execute action
@@ -130,62 +112,40 @@ async function main () {
 			return {name:result["name"], value:result["id"]}});
 		      let delDepartment = await inquirer.prompt(questions.deleteDepart(departments));
 		      console.log("Delete:",delDepartment);
-		      try{
 			db_conn.query(queries.deleteDepartment,
 				      [delDepartment],
-				      (err,res) => console.log(`Deleted ${delDepartment}`));
-		      } catch (err) {
-			console.error(err);
-		      }
+				      (err,res) => console.log(`Deleted ${delDepartment}`)
+				     );
 		    });
       
       break;
     case("13"): //  Delete a role
-      console.log(db_conn);
-      try{
-	let delRole = await inquirer.prompt(questions.deleteRole(roles));
-	console.log(delRole["role"]);
-	// this is where the extra things happens
-	try{ 
-	  db_conn.query(queries.deleteRole,
- 			[delRole["role"]],
- 			(err,res) => {
-			  console.log(`Deleted ${delRole["role"]}`);
-			  if(err) console.error(err);
-			});
-	  db_conn.query(queries.viewRoles,
-			[],
-			(err,res) => console.table("\n",res,"\n\n"));
-	} catch (err) {
-	  console.error(err);
-	}
-      } catch (err) {
-	console.error(err);
-      }
-    
-
+      db_conn.query(queries.getRoles,
+		    async (err, results) => {
+		      roles = results.map((result) => {
+			return {name:result["title"], value:result["id"]}
+		      });
+		      let delRole = await inquirer.prompt(questions.deleteRole(roles));
+ 		      db_conn.query(queries.deleteRole,
+ 				    [delRole["role"]],
+ 				    (err,res) => console.log(`Deleted ${delRole["role"]}`);
+				   );
+		    });
     
       break;
     case("14"): // Delete an employee
-    await db_conn.promise().query("SELECT CONCAT( first_name,' ',last_name) AS' Employee Name',id FROM employee;").then(async ([rows,fields]) => {
-      //      console.log(Object.keys(questions.yees));
-//      console.log(rows);
-      questions.deleteEmployee = rows.map((row) => {
-	return {name:row["Employee Name"], value:row["id"]};
-      });
-      //      console.log(questions.deleteEmployee);
-      try {
-	let delEmployee = await inquirer.prompt(questions.deleteEmployee);
-      } catch (err) {
-	console.errror(err);
-      }
-      console.log(delEmployee);
-      db_conn.execute(queries.deleteEmployee,
-		      [delEmployee.split(' ')],
-		      (err,res) => console.table(`Deleted ${delEmployee}`));
-    }).catch((err) => console.error(err))
-      .then(() => db_conn.end());
-
+      db_conn.query(queries.getEmployees,
+		    async (err, results) => {
+		      employees = results.map((result) => {
+			return {name:result["name"], value:result["id"]}
+		      });
+		      let delEmployee = await inquirer.prompt(questions.deleteEmployee(employees));
+		      db_conn.execute(queries.deleteEmployee,
+				      [delEmployee],
+				      (err,res) => console.table(`Deleted ${delEmployee}`)
+				     );
+		    });
+      
       break;
   case("15"): // Quit
     quit = true;

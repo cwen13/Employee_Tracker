@@ -14,65 +14,108 @@ const db_conn = mysql.createConnection(
   }
 );
 
-let departments;
-let roles;
-let employees;
 
 async function main () {
   let quit = false;
-  while(true) {
-    let action = await inquirer.prompt(questions.mainMenu);
+  //  while(true) {
+  let action = await inquirer.prompt(questions.mainMenu);
+  
+  let departments;
+  let roles;
+  let employees;
+  //    db_conn.query(queries.getEmployees,
+  //		  async (err, results) => {
+  //		    employees = results.map((result) => {
+  //		      return {name:result["name"], value:result["id"]}
+  //		    }).then((info) => employees=info)
+  //		  });
+  
+  
+  
+  
+  // execute action
+  switch (action.mainAction.slice(0,2)) {
+
+  case("01"): // DONE View all departments
+    db_conn.query(queries.viewDepartments,
+		  (err,res) => {
+		    console.table("\n",res,"\n\n");
+		    main();
+		  });
+    break;
+
+  case("02"): // DONE View all roles
+    db_conn.query(queries.viewRoles,
+		  (err,res) => {
+		    console.table("\n",res,"\n\n");
+		    main();
+		  });
+    break;
     
-    // execute action
-    switch (action.mainAction.slice(0,2)) {
-    case("01"): // DONE View all departments
-      db_conn.query(queries.viewDepartments,
-		    (err,res) => console.table("\n",res,"\n\n"));
-      break;
-    case("02"): // DONE View all roles
-      db_conn.query(queries.viewRoles,
-		    (err,res) => console.table("\n",res,"\n\n"));
-      break;
+  case("03"): // DONE View all employees
+    db_conn.query(queries.viewEmployees,
+		  (err,res) => {
+		    console.table("\n",res,"\n\n")
+		    main();
+		  });
+    break;
+    
+  case("04"): // DONE View emplyees by manager
+    db_conn.query(queries.viewEmployeesByManager,
+		  (err,res) => {
+		    console.table("\n",res,"\n\n");
+		    main();
+		  });
+    break;
+    
+  case("05"): // DONE View employees by department
+    db_conn.query(queries.viewEmployeesByDepartment,
+		  (err,res) => {
+		    console.table("\n",res,"\n\n");
+		    main();
+		  });
+    break;
 
-    case("03"): // DONE View all employees
-      db_conn.query(queries.viewEmployees,
-		    (err,res) => console.table("\n",res,"\n\n"));
-      break;
-    case("04"): // DONE View emplyees by manager
-      db_conn.query(queries.viewEmployeesByManager,
-		    (err,res) => console.table("\n",res,"\n\n"));
-      break;
+  case("06"): // DONE View total utlized budget
+    db_conn.query(queries.viewTotBudget,		    
+		  (err,res) => {
+		    console.table("\n",res,"\n\n");
+		    main();
+		  });
+    break;
+    
+  case("07"): // Update an employee role
+    db_conn.query(queries.updateEmployeeRole,
+		  (err,res) => {
+		    console.table("\n",res,"\n\n");
+		    main();
+		  });
+    
+    break;
+    
+  case("08"): // Update employee manager
+    db_conn.query(queries.updateEmplyeeManager,
+		  [],
+		  (err,res) => {
+		    console.table("\n",res,"\n\n");
+		    main();
+		  });
+    
+    break;
 
-    case("05"): // DONE View employees by department
-      db_conn.query(queries.viewEmployeesByDepartment,
-		    (err,res) => console.table("\n",res,"\n\n"));
-      break;
-    case("06"): // DONE View total utlized budget
-      db_conn.query(queries.viewTotBudget,		    
-		    (err,res) => console.table("\n",res,"\n\n"));
-      break;
-      
-    case("07"): // Update an employee role
-      db_conn.query(queries.updateEmployeeRole,
-		    (err,res) => console.table("\n",res,"\n\n"));
-
-      break;
-    case("08"): // Update employee manager
-      db_conn.query(queries.updateEmplyeeManager,
-		    [],
-		    (err,res) => console.table("\n",res,"\n\n"));
-
-      break;
-    case("09"): // DONE Add a department
-      let newDepartment = await inquirer.prompt(questions.addDepartment);
-      console.log(newDepartment);
-      db_conn.query(queries.addDepartment,
-		    [newDepartment["department"]],
-		    (err,res) => console.log(`New department: ${newDepartment} added!`));
-      break;
-      
-    case("10"): // Add a role
-      db_conn.query("SELECT name, id FROM department;",
+  case("09"): // DONE Add a department
+    let newDepartment = await inquirer.prompt(questions.addDepartment);
+    console.log(newDepartment);
+    db_conn.query(queries.addDepartment,
+		  [newDepartment["department"]],
+		  (err,res) => {
+		    console.log(`New department: ${newDepartment["department"]} added!`);
+		    main();
+		  });
+    break;
+    
+  case("10"): // DONE Add a role
+    db_conn.query("SELECT name, id FROM department;",
 		  async (err, results) => {
 		    if (err) {
 		      console.log("Error:", err);
@@ -80,87 +123,112 @@ async function main () {
 		    }
 		    if (results.length) {
 		      departments = results.map((result) => {
-			return {name:result["name"], value:result["id"]}});
-		      console.log(departments);
-		      var mainRole = questions.mainRole(departments);
-		      console.log(mainRole);
-		      let newRole = await inquirer.prompt(mainRole)
-			  .then(() => {
-			    db_conn.query(queries.addRole,
-					  [newRole.role, newRole.salary, departmentID],
-					  (err,res) => console.log(`New role: ${newRole} added!`));
-			  });
-		    
-		    }});
-    break;
-    case("11"): // Add an employee
-      let newEmployee = await inquirer.prompt(
-	questions.addEmployee.push(questions.mainEmployee));
-      db_conn.query(queries.addEmpolyee,
-		    [newEmployee.firstName,
-		     newEmployee.lastName,
-		     newEmployee.rold_id,
-		     newEmployee.manager_id
-		    ],
-		    (err,res) => console.table("\n",res,"\n\n"));
-
-      break;
-    case("12"): // Delete a department
-      db_conn.query(queries.getDepartments,
-		    async (err, results) => {
-		      departments = results.map((result) => {
-			return {name:result["name"], value:result["id"]}});
-		      let delDepartment = await inquirer.prompt(questions.deleteDepart(departments));
-		      console.log("Delete:",delDepartment);
-			db_conn.query(queries.deleteDepartment,
-				      [delDepartment],
-				      (err,res) => console.log(`Deleted ${delDepartment}`)
-				     );
-		    });
-      
-      break;
-    case("13"): //  Delete a role
-      db_conn.query(queries.getRoles,
-		    async (err, results) => {
-		      roles = results.map((result) => {
-			return {name:result["title"], value:result["id"]}
-		      });
-		      let delRole = await inquirer.prompt(questions.deleteRole(roles));
- 		      db_conn.query(queries.deleteRole,
- 				    [delRole["role"]],
- 				    (err,res) => console.log(`Deleted ${delRole["role"]}`);
-				   );
-		    });
-    
-      break;
-    case("14"): // Delete an employee
-      db_conn.query(queries.getEmployees,
-		    async (err, results) => {
-		      employees = results.map((result) => {
 			return {name:result["name"], value:result["id"]}
 		      });
-		      let delEmployee = await inquirer.prompt(questions.deleteEmployee(employees));
-		      db_conn.execute(queries.deleteEmployee,
-				      [delEmployee],
-				      (err,res) => console.table(`Deleted ${delEmployee}`)
-				     );
+		      var mainRole = questions.mainRole(departments);
+		      console.log(mainRole[2]["choices"]);
+		      // let newRole = await
+		      inquirer.prompt(mainRole)
+			.then((newRole) => {
+			  db_conn.query(queries.addRole,
+					[
+					  newRole.role,
+					  newRole.salary,
+					  newRole.depart
+					],
+					(err,res) => {
+					  console.log(`New role: ${newRole} added!`);
+					  main();
+					});
+			});
+		      
+		    }});
+    break;
+    
+  case("11"): // Add an employee
+    let newEmployee = await inquirer.prompt(
+      questions.addEmployee.push(questions.mainEmployee));
+    db_conn.query(queries.addEmpolyee,
+		  [
+		    newEmployee.firstName,
+		    newEmployee.lastName,
+		    newEmployee.rold_id,
+		    newEmployee.manager_id
+		  ],
+		  (err,res) => {
+		    console.table("\n",res,"\n\n");
+		    main();
+		  });
+    
+    break;
+    
+  case("12"): // DONE Delete a department
+    db_conn.query(queries.getDepartments,
+		  async (err, results) => {
+		    departments = results.map((result) => {
+		      return {name:result["name"], value:result["id"]}
 		    });
-      
-      break;
+		    let delDepartment = await inquirer.prompt(questions.deleteDepart(departments));
+		    console.log("Delete:",delDepartment["department"]);
+		    db_conn.query(queries.deleteDepartment,
+				  [
+				    delDepartment["department"]
+				  ],
+				  (err,res) => {
+				    console.log(`Deleted ${delDepartment}`)
+				    main();
+				  })
+		    
+		  });
+    
+    break;
+    
+  case("13"): //  DONE Delete a role
+    db_conn.query(queries.getRoles,
+		  async (err, results) => {
+		    roles = results.map((result) => {
+		      return {name:result["title"], value:result["id"]}
+		    });
+		    let delRole = await inquirer.prompt(questions.deleteRole(roles));
+ 		    db_conn.query(queries.deleteRole,
+ 				  [
+				    delRole["role"]
+				  ],
+ 				  (err,res) => {
+				    console.log(`Deleted ${delRole["role"]}`)
+				    main();
+				  });
+		  });
+    
+    break;
+    
+  case("14"): // DONE Delete an employee
+    db_conn.query(queries.getEmployees,
+		  async (err, results) => {
+		    employees = results.map((result) => {
+		      return {name:result["name"], value:result["id"]}
+		    });
+		    let delEmployee = await inquirer.prompt(questions.deleteEmployee(employees));
+		    db_conn.execute(queries.deleteEmployee,
+				    [
+				      delEmployee["employee"]
+				    ],
+				    (err,res) => {
+				      console.table(`Deleted ${delEmployee}`);
+				      main();
+				    });
+		  });
+    
+    break;
   case("15"): // Quit
     quit = true;
     break;
   default:
     break;
   }
-    if (quit) break;
-  }
-
-//   if (!quit) main();
-    
-  process.exit(0);
+  if (quit) return 0;
 }
-      
+
 main();  
-    
-       
+
+

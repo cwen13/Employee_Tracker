@@ -16,22 +16,12 @@ const db_conn = mysql.createConnection(
 
 
 async function main () {
-  let quit = false;
-  //  while(true) {
   let action = await inquirer.prompt(questions.mainMenu);
   
   let departments;
   let roles;
   let employees;
-  //    db_conn.query(queries.getEmployees,
-  //		  async (err, results) => {
-  //		    employees = results.map((result) => {
-  //		      return {name:result["name"], value:result["id"]}
-  //		    }).then((info) => employees=info)
-  //		  });
-  
-  
-  
+  let managers;
   
   // execute action
   switch (action.mainAction.slice(0,2)) {
@@ -84,25 +74,82 @@ async function main () {
 		  });
     break;
     
-  case("07"): // Update an employee role
-    db_conn.query(queries.updateEmployeeRole,
-		  (err,res) => {
-		    console.table("\n",res,"\n\n");
-		    main();
+  case("07"): // DONE Update an employee role
+    db_conn.query(queries.getEmployees,
+		  async (err, results) => {
+		    if (err) {
+		      console.log("Error:", err);
+		      return;
+		    }
+		    if (results.length) {
+		      employees = results.map((result) => {
+			return {name:result["name"], value:result["id"]}
+		      });
+		      
+		      db_conn.query(queries.getRoles,
+			      async (err, results) => {
+				if (results.length) {
+				  roles = results.map((result) => {
+				    return {name:result["title"], value:result["id"]}
+				  });
+				  inquirer.prompt(questions.updateEmployee(employees))
+				    .then((employee) => {
+				      console.log(employee["employee"]);
+				      inquirer.prompt(questions.updateRole(roles))
+					.then((role) => {
+					  db_conn.query(queries.updateEmployeeRole,
+							[
+							  role["role"],
+							  employee["employee"]
+							],
+							(err, res) =>  main()
+							);
+					})
+				    })
+				}
+			      });
+		    }
 		  });
-    
     break;
     
   case("08"): // Update employee manager
-    db_conn.query(queries.updateEmplyeeManager,
-		  [],
-		  (err,res) => {
-		    console.table("\n",res,"\n\n");
-		    main();
+    db_conn.query(queries.getEmployees,
+    		  async (err, results) => {
+		    if (err) {
+		      console.log("Error:", err);
+		      return;
+		    }
+		    if (results.length) {
+		      employees = results.map((result) => {
+			return {name:result["name"], value:result["id"]}
+		      });
+		      db_conn.query(queries.getManagers,
+				    async (err, results) => {
+				      if (results.length) {
+					managers = results.map((result) => {
+					  return {name:result["name"], value:result["id"]}
+					});
+					inquirer.prompt(questions.updateEmployee(employees))
+					  .then((employee) => {
+					    inquirer.prompt(questions.updateManager(managers))
+					      .then((manager) => {
+						db_conn.query(queries.updateEmployeeManager,
+							      [
+								manager["manager"],
+								employee["employee"]
+							      ],
+							      (err, res) => {
+								main();
+							      });
+					      })
+					  })
+				      }
+				    });
+		    }
 		  });
     
     break;
-
+    
   case("09"): // DONE Add a department
     let newDepartment = await inquirer.prompt(questions.addDepartment);
     console.log(newDepartment);
@@ -127,7 +174,7 @@ async function main () {
 		      });
 		      var mainRole = questions.mainRole(departments);
 		      console.log(mainRole[2]["choices"]);
-		      // let newRole = await
+8		      // let newRole = await
 		      inquirer.prompt(mainRole)
 			.then((newRole) => {
 			  db_conn.query(queries.addRole,
@@ -221,12 +268,11 @@ async function main () {
     
     break;
   case("15"): // Quit
-    quit = true;
+    process.exit(0);
     break;
   default:
     break;
   }
-  if (quit) return 0;
 }
 
 main();  

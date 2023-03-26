@@ -112,7 +112,7 @@ async function main () {
 		  });
     break;
     
-  case("08"): // DONE Update employee manager
+  case("08"): //  Update employee manager
     db_conn.query(queries.getEmployees,
     		  async (err, results) => {
 		    if (err) {

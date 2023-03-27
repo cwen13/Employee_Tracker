@@ -212,8 +212,7 @@ async function main () {
 					let newEmployee = await inquirer.prompt(
 					  questions.addEmployee.concat(questions.mainEmployee(roles,managers)));
 
-					console.log(newEmployee);
-					db_conn.query(queries.addEmpolyee,
+					db_conn.query(queries.addEmployee,
 						      [
 							newEmployee.firstName,
 							newEmployee.lastName,
@@ -224,10 +223,10 @@ async function main () {
 							console.table("\n",res,"\n\n");
 							main();
 						      });
-				      }
-				    })
-		    }
-		  });
+				      }})
+		    }});
+				   
+		   
     
     break;
     

@@ -193,18 +193,40 @@ async function main () {
     break;
     
   case("11"): // Add an employee
-    let newEmployee = await inquirer.prompt(
-      questions.addEmployee.push(questions.mainEmployee));
-    db_conn.query(queries.addEmpolyee,
-		  [
-		    newEmployee.firstName,
-		    newEmployee.lastName,
-		    newEmployee.rold_id,
-		    newEmployee.manager_id
-		  ],
-		  (err,res) => {
-		    console.table("\n",res,"\n\n");
-		    main();
+    console.log("level 0");
+    db_conn.query(queries.getRoles,
+		  async (err, results) => {
+		    if (results.length) {
+		      roles = results.map((result) => {
+			return {name:result["title"], value:result["id"]}
+		      });
+		      console.log("level 1");
+		      db_conn.query(queries.getManagers,
+				    async (err, results) => {
+				      if (results.length) {
+					managers = results.map((result) => {
+					  return {name:result["name"], value:result["id"]}
+					});
+					console.log("level 2");
+					
+					let newEmployee = await inquirer.prompt(
+					  questions.addEmployee.concat(questions.mainEmployee(roles,managers)));
+
+					console.log(newEmployee);
+					db_conn.query(queries.addEmpolyee,
+						      [
+							newEmployee.firstName,
+							newEmployee.lastName,
+							newEmployee.role,
+							newEmployee.manager
+						      ],
+						      (err,res) => {
+							console.table("\n",res,"\n\n");
+							main();
+						      });
+				      }
+				    })
+		    }
 		  });
     
     break;

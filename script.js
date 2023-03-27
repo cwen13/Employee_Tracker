@@ -14,7 +14,6 @@ const db_conn = mysql.createConnection(
   }
 );
 
-
 async function main () {
   let action = await inquirer.prompt(questions.mainMenu);
   
@@ -174,7 +173,7 @@ async function main () {
 		      });
 		      var mainRole = questions.mainRole(departments);
 		      console.log(mainRole[2]["choices"]);
-8		      // let newRole = await
+		      // let newRole = await
 		      inquirer.prompt(mainRole)
 			.then((newRole) => {
 			  db_conn.query(queries.addRole,
@@ -192,7 +191,7 @@ async function main () {
 		    }});
     break;
     
-  case("11"): // Add an employee
+  case("11"): // DONE Add an employee
     console.log("level 0");
     db_conn.query(queries.getRoles,
 		  async (err, results) => {

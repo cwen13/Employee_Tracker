@@ -16,3 +16,5 @@ MIT
 ## Screen Shots
 
 ![screen shot of a few queries and the main menu](./assets/images/main-menu-queries.png)
+
+![Video of the program in aciton.](https://watch.screencastify.com/v/0Hg5iZzhWf5bFkx5Gf6Y)

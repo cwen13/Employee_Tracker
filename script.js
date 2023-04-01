@@ -179,7 +179,6 @@ async function main () {
 					  newRole.depart
 					],
 					(err,res) => {
-					  console.log(`New role: ${newRole} added!`);
 					  main();
 					});
 			});
@@ -188,7 +187,6 @@ async function main () {
     break;
     
   case("11"): // DONE Add an employee
-    console.log("level 0");
     db_conn.query(queries.getRoles,
 		  async (err, results) => {
 		    if (results.length) {
@@ -201,7 +199,6 @@ async function main () {
 					managers = results.map((result) => {
 					  return {name:result["name"], value:result["id"]}
 					});
-					console.log("level 2");
 					
 					let newEmployee = await inquirer.prompt(
 					  questions.addEmployee.concat(questions.mainEmployee(roles,managers)));
@@ -214,7 +211,6 @@ async function main () {
 							newEmployee.manager
 						      ],
 						      (err,res) => {
-							console.table("\n",res,"\n\n");
 							main();
 						      });
 				      }})
@@ -236,7 +232,6 @@ async function main () {
 				    delDepartment["department"]
 				  ],
 				  (err,res) => {
-				    console.log(`Deleted ${delDepartment}`)
 				    main();
 				  })
 		    
@@ -256,7 +251,6 @@ async function main () {
 				    delRole["role"]
 				  ],
  				  (err,res) => {
-				    console.log(`Deleted ${delRole["role"]}`)
 				    main();
 				  });
 		  });

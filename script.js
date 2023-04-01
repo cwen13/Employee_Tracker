@@ -93,7 +93,6 @@ async function main () {
 				  });
 				  inquirer.prompt(questions.updateEmployee(employees))
 				    .then((employee) => {
-				      console.log(employee["employee"]);
 				      inquirer.prompt(questions.updateRole(roles))
 					.then((role) => {
 					  db_conn.query(queries.updateEmployeeRole,
@@ -151,11 +150,9 @@ async function main () {
     
   case("09"): // DONE Add a department
     let newDepartment = await inquirer.prompt(questions.addDepartment);
-    console.log(newDepartment);
     db_conn.query(queries.addDepartment,
 		  [newDepartment["department"]],
 		  (err,res) => {
-		    console.log(`New department: ${newDepartment["department"]} added!`);
 		    main();
 		  });
     break;
@@ -172,7 +169,6 @@ async function main () {
 			return {name:result["name"], value:result["id"]}
 		      });
 		      var mainRole = questions.mainRole(departments);
-		      console.log(mainRole[2]["choices"]);
 		      // let newRole = await
 		      inquirer.prompt(mainRole)
 			.then((newRole) => {
@@ -199,7 +195,6 @@ async function main () {
 		      roles = results.map((result) => {
 			return {name:result["title"], value:result["id"]}
 		      });
-		      console.log("level 1");
 		      db_conn.query(queries.getManagers,
 				    async (err, results) => {
 				      if (results.length) {
@@ -236,7 +231,6 @@ async function main () {
 		      return {name:result["name"], value:result["id"]}
 		    });
 		    let delDepartment = await inquirer.prompt(questions.deleteDepart(departments));
-		    console.log("Delete:",delDepartment["department"]);
 		    db_conn.query(queries.deleteDepartment,
 				  [
 				    delDepartment["department"]
@@ -281,7 +275,6 @@ async function main () {
 				      delEmployee["employee"]
 				    ],
 				    (err,res) => {
-				      console.table(`Deleted ${delEmployee}`);
 				      main();
 				    });
 		  });
